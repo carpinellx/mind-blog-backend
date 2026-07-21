@@ -62,6 +62,10 @@ export async function buscarArtigoPorId(id: number): Promise<any | null> {
   return { ...artigo, tags, total_curtidas: totalCurtidas };
 }
 
+export async function incrementarVisualizacao(id: number): Promise<void> {
+  await pool.query('UPDATE artigos SET visualizacoes = visualizacoes + 1 WHERE id = ?', [id]);
+}
+
 export async function atualizarArtigo(
   id: number,
   titulo: string,
@@ -73,13 +77,13 @@ export async function atualizarArtigo(
 ): Promise<void> {
   if (imagemBanner) {
     await pool.query(
-      `UPDATE artigos SET titulo = ?, resumo = ?, conteudo = ?, categoria = ?, imagem_banner = ?, tempo_leitura = ?
+      `UPDATE artigos SET titulo = ?, resumo = ?, conteudo = ?, categoria = ?, imagem_banner = ?, tempo_leitura = ?, data_atualizacao = NOW()
        WHERE id = ?`,
       [titulo, resumo, conteudo, categoria, imagemBanner, tempoLeitura, id]
     );
   } else {
     await pool.query(
-      `UPDATE artigos SET titulo = ?, resumo = ?, conteudo = ?, categoria = ?, tempo_leitura = ?
+      `UPDATE artigos SET titulo = ?, resumo = ?, conteudo = ?, categoria = ?, tempo_leitura = ?, data_atualizacao = NOW()
        WHERE id = ?`,
       [titulo, resumo, conteudo, categoria, tempoLeitura, id]
     );

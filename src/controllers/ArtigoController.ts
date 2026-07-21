@@ -3,6 +3,7 @@ import {
   criarArtigo,
   listarArtigos,
   buscarArtigoPorId,
+  incrementarVisualizacao,
   atualizarArtigo,
   excluirArtigo,
 } from '../models/ArtigoModel';
@@ -70,7 +71,9 @@ export async function buscarUm(req: Request, res: Response) {
       return res.status(404).json({ erro: 'Artigo não encontrado.' });
     }
 
-    return res.json(artigo);
+    await incrementarVisualizacao(id);
+
+    return res.json({ ...artigo, visualizacoes: artigo.visualizacoes + 1 });
   } catch (erro) {
     console.error(erro);
     return res.status(500).json({ erro: 'Erro ao buscar artigo.' });
