@@ -4,8 +4,12 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 export interface Artigo {
   id: number;
   titulo: string;
+  resumo: string | null;
   conteudo: string;
+  categoria: string | null;
   imagem_banner: string | null;
+  tempo_leitura: number | null;
+  visualizacoes: number;
   autor_id: number;
   data_publicacao: Date;
   data_atualizacao: Date;
@@ -13,13 +17,17 @@ export interface Artigo {
 
 export async function criarArtigo(
   titulo: string,
+  resumo: string | null,
   conteudo: string,
+  categoria: string | null,
   imagemBanner: string | null,
+  tempoLeitura: number,
   autorId: number
 ): Promise<number> {
   const [resultado] = await pool.query<ResultSetHeader>(
-    'INSERT INTO artigos (titulo, conteudo, imagem_banner, autor_id) VALUES (?, ?, ?, ?)',
-    [titulo, conteudo, imagemBanner, autorId]
+    `INSERT INTO artigos (titulo, resumo, conteudo, categoria, imagem_banner, tempo_leitura, autor_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [titulo, resumo, conteudo, categoria, imagemBanner, tempoLeitura, autorId]
   );
   return resultado.insertId;
 }
@@ -48,18 +56,23 @@ export async function buscarArtigoPorId(id: number): Promise<Artigo | null> {
 export async function atualizarArtigo(
   id: number,
   titulo: string,
+  resumo: string | null,
   conteudo: string,
-  imagemBanner: string | null
+  categoria: string | null,
+  imagemBanner: string | null,
+  tempoLeitura: number
 ): Promise<void> {
   if (imagemBanner) {
     await pool.query(
-      'UPDATE artigos SET titulo = ?, conteudo = ?, imagem_banner = ? WHERE id = ?',
-      [titulo, conteudo, imagemBanner, id]
+      `UPDATE artigos SET titulo = ?, resumo = ?, conteudo = ?, categoria = ?, imagem_banner = ?, tempo_leitura = ?
+       WHERE id = ?`,
+      [titulo, resumo, conteudo, categoria, imagemBanner, tempoLeitura, id]
     );
   } else {
     await pool.query(
-      'UPDATE artigos SET titulo = ?, conteudo = ? WHERE id = ?',
-      [titulo, conteudo, id]
+      `UPDATE artigos SET titulo = ?, resumo = ?, conteudo = ?, categoria = ?, tempo_leitura = ?
+       WHERE id = ?`,
+      [titulo, resumo, conteudo, categoria, tempoLeitura, id]
     );
   }
 }
