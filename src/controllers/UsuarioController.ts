@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { criarUsuario, buscarUsuarioPorEmail } from '../models/UsuarioModel';
+import { criarUsuario, buscarUsuarioPorEmail, buscarUsuarioPorId, atualizarPerfil } from '../models/UsuarioModel';
 import jwt from 'jsonwebtoken';
 
 export async function cadastrar(req: Request, res: Response) {
@@ -55,5 +55,42 @@ export async function login(req: Request, res: Response) {
   } catch (erro) {
     console.error(erro);
     return res.status(500).json({ erro: 'Erro ao fazer login.' });
+  }
+}
+
+export async function meuPerfil(req: Request, res: Response) {
+  try {
+    const id = req.usuario!.id;
+    const usuario = await buscarUsuarioPorId(id);
+
+    if (!usuario) {
+      return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    }
+
+    return res.json(usuario);
+  } catch (erro) {
+    console.error(erro);
+    return res.status(500).json({ erro: 'Erro ao buscar perfil.' });
+  }
+}
+
+
+export async function atualizarMeuPerfil(req: Request, res: Response) {
+  try {
+    const id = req.usuario!.id;
+    const { nome, bio, foto_url } = req.body;
+
+    if (!nome) {
+      return res.status(400).json({ erro: 'Nome é obrigatório.' });
+    }
+
+    await atualizarPerfil(id, nome, bio || null, foto_url || null);
+
+    const usuarioAtualizado = await buscarUsuarioPorId(id);
+
+    return res.json(usuarioAtualizado);
+  } catch (erro) {
+    console.error(erro);
+    return res.status(500).json({ erro: 'Erro ao atualizar perfil.' });
   }
 }
