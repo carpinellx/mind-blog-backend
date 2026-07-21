@@ -6,6 +6,7 @@ import {
   atualizarArtigo,
   excluirArtigo,
 } from '../models/ArtigoModel';
+import { buscarOuCriarTag, associarTagsAoArtigo, removerTagsDoArtigo } from '../models/TagModel';
 
 const CATEGORIAS_VALIDAS = [
   'Desenvolvimento web',
@@ -17,7 +18,7 @@ const CATEGORIAS_VALIDAS = [
 
 export async function criar(req: Request, res: Response) {
   try {
-    const { titulo, resumo, conteudo, categoria } = req.body;
+    const { titulo, resumo, conteudo, categoria, tags } = req.body;
     const autorId = req.usuario!.id;
 
     if (!titulo || !conteudo) {
@@ -33,7 +34,11 @@ export async function criar(req: Request, res: Response) {
 
     const id = await criarArtigo(titulo, resumo || null, conteudo, categoria || null, imagemBanner, tempoLeitura, autorId);
 
-    return res.status(201).json({ id, titulo, resumo, conteudo, categoria, imagem_banner: imagemBanner, tempo_leitura: tempoLeitura });
+    const listaTags: string[] = tags ? JSON.parse(tags) : [];
+    const tagIds = await Promise.all(listaTags.map((nomeTag: string) => buscarOuCriarTag(nomeTag)));
+    await associarTagsAoArtigo(id, tagIds);
+
+    return res.status(201).json({ id, titulo, resumo, conteudo, categoria, imagem_banner: imagemBanner, tempo_leitura: tempoLeitura, tags: listaTags });
   } catch (erro) {
     console.error(erro);
     return res.status(500).json({ erro: 'Erro ao criar artigo.' });
@@ -75,7 +80,7 @@ export async function buscarUm(req: Request, res: Response) {
 export async function atualizar(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
-    const { titulo, resumo, conteudo, categoria } = req.body;
+    const { titulo, resumo, conteudo, categoria, tags } = req.body;
 
     const artigo = await buscarArtigoPorId(id);
     if (!artigo) {
@@ -94,6 +99,13 @@ export async function atualizar(req: Request, res: Response) {
     const tempoLeitura = calcularTempoLeitura(conteudo);
 
     await atualizarArtigo(id, titulo, resumo || null, conteudo, categoria || null, imagemBanner, tempoLeitura);
+
+    if (tags !== undefined) {
+      const listaTags: string[] = JSON.parse(tags);
+      await removerTagsDoArtigo(id);
+      const tagIds = await Promise.all(listaTags.map((nomeTag: string) => buscarOuCriarTag(nomeTag)));
+      await associarTagsAoArtigo(id, tagIds);
+    }
 
     return res.json({ mensagem: 'Artigo atualizado com sucesso.' });
   } catch (erro) {

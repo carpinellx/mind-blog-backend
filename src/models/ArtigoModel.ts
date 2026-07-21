@@ -1,5 +1,6 @@
 import pool from '../config/database';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import { buscarTagsPorArtigo } from './TagModel';
 
 export interface Artigo {
   id: number;
@@ -42,7 +43,7 @@ export async function listarArtigos(): Promise<RowDataPacket[]> {
   return linhas;
 }
 
-export async function buscarArtigoPorId(id: number): Promise<Artigo | null> {
+export async function buscarArtigoPorId(id: number): Promise<any | null> {
   const [linhas] = await pool.query<RowDataPacket[]>(
     `SELECT artigos.*, usuarios.nome AS autor_nome
      FROM artigos
@@ -50,7 +51,13 @@ export async function buscarArtigoPorId(id: number): Promise<Artigo | null> {
      WHERE artigos.id = ?`,
     [id]
   );
-  return linhas.length > 0 ? (linhas[0] as Artigo) : null;
+
+  if (linhas.length === 0) return null;
+
+  const artigo = linhas[0];
+  const tags = await buscarTagsPorArtigo(id);
+
+  return { ...artigo, tags };
 }
 
 export async function atualizarArtigo(
