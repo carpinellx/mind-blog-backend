@@ -1,6 +1,7 @@
 import pool from '../config/database';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { buscarTagsPorArtigo } from './TagModel';
+import { contarCurtidas } from './CurtidaModel';
 
 export interface Artigo {
   id: number;
@@ -56,8 +57,9 @@ export async function buscarArtigoPorId(id: number): Promise<any | null> {
 
   const artigo = linhas[0];
   const tags = await buscarTagsPorArtigo(id);
+  const totalCurtidas = await contarCurtidas(id);
 
-  return { ...artigo, tags };
+  return { ...artigo, tags, total_curtidas: totalCurtidas };
 }
 
 export async function atualizarArtigo(

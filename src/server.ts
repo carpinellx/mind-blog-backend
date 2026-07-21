@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import usuarioRoutes from './routes/usuarioRoutes';
 import artigoRoutes from './routes/artigoRoutes';
+import curtidaRoutes from './routes/curtidaRoutes';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(usuarioRoutes);
 app.use(artigoRoutes);
+app.use(curtidaRoutes);
 
 app.get('/', (req, res) => {
   res.json({ mensagem: 'API do Mind Blog rodando!' });
