@@ -6,6 +6,7 @@ import usuarioRoutes from './routes/usuarioRoutes';
 import artigoRoutes from './routes/artigoRoutes';
 import curtidaRoutes from './routes/curtidaRoutes';
 import comentarioRoutes from './routes/comentarioRoutes';
+import dashboardRoutes from './routes/dashboardRoutes';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(usuarioRoutes);
 app.use(artigoRoutes);
 app.use(curtidaRoutes);
 app.use(comentarioRoutes);
+app.use(dashboardRoutes);
 
 app.get('/', (req, res) => {
   res.json({ mensagem: 'API do Mind Blog rodando!' });
