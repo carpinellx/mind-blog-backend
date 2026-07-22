@@ -8,6 +8,7 @@ import {
   excluirArtigo,
 } from '../models/ArtigoModel';
 import { buscarOuCriarTag, associarTagsAoArtigo, removerTagsDoArtigo } from '../models/TagModel';
+import { usuarioCurtiu } from '../models/CurtidaModel';
 
 const CATEGORIAS_VALIDAS = [
   'Desenvolvimento web',
@@ -76,7 +77,13 @@ export async function buscarUm(req: Request, res: Response) {
 
     await incrementarVisualizacao(id);
 
-    return res.json({ ...artigo, visualizacoes: artigo.visualizacoes + 1 });
+    const curtidoPeloUsuario = req.usuario ? await usuarioCurtiu(req.usuario.id, id) : false;
+
+    return res.json({
+      ...artigo,
+      visualizacoes: artigo.visualizacoes + 1,
+      curtido_pelo_usuario: curtidoPeloUsuario,
+    });
   } catch (erro) {
     console.error(erro);
     return res.status(500).json({ erro: 'Erro ao buscar artigo.' });

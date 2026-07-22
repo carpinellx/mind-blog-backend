@@ -35,3 +35,26 @@ export function autenticar(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ erro: 'Token inválido ou expirado.' });
   }
 }
+
+export function autenticarOpcional(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return next();
+  }
+
+  const [tipo, token] = authHeader.split(' ');
+
+  if (tipo !== 'Bearer' || !token) {
+    return next();
+  }
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET as string) as PayloadToken;
+    req.usuario = payload;
+  } catch {
+    // token inválido/expirado ignora e segue sem usuário autenticado
+  }
+
+  return next();
+}
