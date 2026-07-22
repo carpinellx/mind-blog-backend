@@ -42,6 +42,9 @@ export async function criar(req: Request, res: Response) {
     return res.status(201).json({ id, titulo, resumo, conteudo, categoria, imagem_banner: imagemBanner, tempo_leitura: tempoLeitura, tags: listaTags });
   } catch (erro) {
     console.error(erro);
+    if (erro instanceof Error && erro.message === 'File too large') {
+      return res.status(400).json({ erro: 'A imagem deve ter no máximo 5MB.' });
+    }
     return res.status(500).json({ erro: 'Erro ao criar artigo.' });
   }
 }

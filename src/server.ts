@@ -7,6 +7,7 @@ import artigoRoutes from './routes/artigoRoutes';
 import curtidaRoutes from './routes/curtidaRoutes';
 import comentarioRoutes from './routes/comentarioRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
+import { tratadorErros } from './middlewares/tratadorErros';
 
 dotenv.config();
 
@@ -24,6 +25,8 @@ app.use(dashboardRoutes);
 app.get('/', (req, res) => {
   res.json({ mensagem: 'API do Mind Blog rodando!' });
 });
+
+app.use(tratadorErros);
 
 const PORT = process.env.PORT || 3333;
 
