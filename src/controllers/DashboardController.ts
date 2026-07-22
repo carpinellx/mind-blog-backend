@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { buscarEstatisticas } from '../models/DashboardModel';
+import { buscarEstatisticas, buscarAtividadeRecente } from '../models/DashboardModel';
 
 export async function estatisticas(req: Request, res: Response) {
   try {
@@ -9,5 +9,16 @@ export async function estatisticas(req: Request, res: Response) {
   } catch (erro) {
     console.error(erro);
     return res.status(500).json({ erro: 'Erro ao buscar estatísticas.' });
+  }
+}
+
+export async function atividadeRecente(req: Request, res: Response) {
+  try {
+    const usuarioId = req.usuario!.id;
+    const dados = await buscarAtividadeRecente(usuarioId);
+    return res.json(dados);
+  } catch (erro) {
+    console.error(erro);
+    return res.status(500).json({ erro: 'Erro ao buscar atividade recente.' });
   }
 }
