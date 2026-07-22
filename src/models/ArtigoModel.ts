@@ -36,7 +36,8 @@ export async function criarArtigo(
 
 export async function listarArtigos(): Promise<RowDataPacket[]> {
   const [linhas] = await pool.query<RowDataPacket[]>(
-    `SELECT artigos.*, usuarios.nome AS autor_nome
+    `SELECT artigos.*, usuarios.nome AS autor_nome,
+       (SELECT COUNT(*) FROM curtidas WHERE curtidas.artigo_id = artigos.id) AS total_curtidas
      FROM artigos
      JOIN usuarios ON artigos.autor_id = usuarios.id
      ORDER BY artigos.data_publicacao DESC`
