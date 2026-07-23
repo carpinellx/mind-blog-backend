@@ -36,16 +36,17 @@ Pré-requisitos: Node 18+ e MySQL 8 instalados.
 
 2. Crie o banco e importe o dump:
 
-   No Linux/macOS ou Git Bash:
 ```bash
    mysql -u root -p -e "CREATE DATABASE mind_blog"
-   mysql -u root -p mind_blog < database/mind_blog_dump.sql
 ```
 
-   No PowerShell (Windows):
-```powershell
-   mysql -u root -p -e "CREATE DATABASE mind_blog"
-   Get-Content database/mind_blog_dump.sql | mysql -u root -p mind_blog
+   Depois, entre no MySQL e importe o dump com `SOURCE` (funciona em qualquer terminal: PowerShell, cmd, ou Linux/macOS):
+```bash
+   mysql -u root -p
+```
+```sql
+   USE mind_blog;
+   SOURCE database/mind_blog_dump.sql;
 ```
 
 3. Crie um `.env` na raiz com:
